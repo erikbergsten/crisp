@@ -6,6 +6,6 @@
 
 (def incy (gen_inc y))
 
-(incy 10)
+(print (incy 10))
 
 (print '(hello world))

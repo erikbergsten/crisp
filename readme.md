@@ -1,5 +1,18 @@
-CMake project skeleton
-======================
+Crisp
+=====
 
-Skeleton for projects using cmake for building and munit for testing.
-all 3 cmakelists must be configured before you use them!
+Build & Run
+-----------
+
+    mkdir build && cd build
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    make
+    ./tests/run_tests
+
+Notes
+-----
+
+Lots of debug info is printed, to remove it unset the CR_DEBUG flag
+in CMakeLists.txt and remake.
+
+Building and running has only been tested on os x using clang.
