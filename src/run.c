@@ -73,3 +73,7 @@ void cr_run_list(cr_list * statements){
   //cr_runtime_finish(&rt);
   //cr_force_free(cr_imlist_empty);
 }
+
+void cr_run_repl(cr_runtime * rt){
+  
+}

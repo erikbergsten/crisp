@@ -98,12 +98,13 @@ cr_object * cr_core_fun_macro(cr_imlist * args, cr_runtime * rt, cr_env * env){
   cr_imlist * ret3 = cr_imlist_prependS(ret2, cr_symbol_new("fun_"));
   return (cr_object *) ret3;
 }
+/*
 cr_object * cr_core_defmacro(cr_imlist * args, cr_runtime * rt, cr_env * env){
   cr_imlist * arg_list = (cr_imlist *) args->value;
   args = args->next;
   cr_imlist * body = (cr_imlist *) args->value;
   return (cr_object *) cr_macro_new(env, arg_list, body);
-}
+}*/
 cr_object * cr_core_defmacro_macro(cr_imlist * args, cr_runtime * rt, cr_env * env){
   cr_imlist * arg_list = (cr_imlist *) args->value;
   args = args->next;
@@ -207,10 +208,12 @@ void _add_fun(cr_env * env, char * name, cr_native_function function){
   cr_env_setS(env, cr_symbol_new(name), cr_fun_native_new(function));
 }
 
+/*
 void _add_macro(cr_env * env, char * name, cr_native_function function){
   cr_debug_info("Adding core macro: %s", name);
   cr_env_setS(env, cr_symbol_new(name), cr_macro_native_new(function));
 }
+*/
 cr_symbol * cr_true, * cr_false;
 void cr_core_init(){
   cr_true = cr_symbol_new("true");
@@ -218,23 +221,23 @@ void cr_core_init(){
 }
 void cr_core_register(cr_env * env){
   _add_fun(env, "module_", cr_core_module);
-  _add_macro(env, "module", cr_core_module_macro);
+  //_add_macro(env, "module", cr_core_module_macro);
 
   _add_fun(env, "in_", cr_core_in);
-  _add_macro(env, "in", cr_core_in_macro);
+  //_add_macro(env, "in", cr_core_in_macro);
 
   _add_fun(env, "def_", cr_core_def);
-  _add_macro(env, "def", cr_core_def_macro);
+  //_add_macro(env, "def", cr_core_def_macro);
 
   _add_fun(env, "fun_", cr_core_fun);
-  _add_macro(env, "fun", cr_core_fun_macro);
+  //_add_macro(env, "fun", cr_core_fun_macro);
 
-  _add_fun(env, "macro_", cr_core_defmacro);
-  _add_macro(env, "macro", cr_core_defmacro_macro);
+//  _add_fun(env, "macro_", cr_core_defmacro);
+  //_add_macro(env, "macro", cr_core_defmacro_macro);
 
   _add_fun(env, "print", cr_core_print);
   _add_fun(env, "if_", cr_core_if);
   _add_fun(env, "do_", cr_core_do);
-  _add_macro(env, "if", cr_core_if_macro);
+  //_add_macro(env, "if", cr_core_if_macro);
   _add_fun(env, "=", cr_core_eq);
 }

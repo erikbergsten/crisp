@@ -26,4 +26,6 @@ cr_object * cr_imlist_head(cr_imlist * list);
 cr_imlist * cr_imlist_from_str(char * str);
 void cr_imlist_print_str(cr_imlist * imlist);
 
+cr_imlist * cr_imlist_reverse(cr_imlist * list);
+
 #endif /* __crisp_imlist_h__ */

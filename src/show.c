@@ -36,17 +36,9 @@ void _show_tuple(char * dest, cr_tuple * tuple){
 }
 void _show_fun(char * dest, cr_fun * fun){
   if(fun->form == cr_function_native){
-    if(fun->macro){
-      sprintfe(dest, "[native macro]");
-    }else{
-      sprintfe(dest, "[native function]");
-    }
+    sprintfe(dest, "[native function]");
   }else{
-    if(fun->macro){
-      sprintfe(dest, "[normal macro]");
-    }else{
-      sprintfe(dest, "[normal function]");
-    }
+    sprintfe(dest, "[normal function]");
   }
 }
 void _show_quote(char * dest, cr_quote * q){
@@ -59,6 +51,11 @@ void _cr_show(char * dest, cr_object * obj){
       {
         cr_integer * i = (cr_integer *) obj;
         sprintfa(dest, "%i", i->value);
+        break;
+      }
+    case cr_macro_type:
+      {
+        sprintfe(dest, "[macro]");
         break;
       }
     case cr_double_type:

@@ -10,6 +10,7 @@ typedef enum {
   cr_tuple_type,
   cr_quote_type,
   cr_function_type,
+  cr_macro_type,
   cr_unknown_type
 } cr_type;
 
@@ -26,5 +27,6 @@ typedef struct {
 
 uint32_t cr_object_hash(cr_object * object);
 int cr_object_cmp(cr_object * obj1, cr_object * obj2);
+#define  cr_object_type(o, t) (o->prototype->type == t)
 
 #endif /* __crisp_value_h__ */

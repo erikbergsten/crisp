@@ -70,18 +70,22 @@ cr_imlist * cr_imlist_from_str(char * str){
 }
 void cr_imlist_print_str(cr_imlist * list){
   while(list != cr_imlist_empty){
-    if(list->value->prototype->type != cr_integer_type){
+    cr_integer * i = (cr_integer *) list->value;
+    if(! (cr_object_type(i, cr_integer_type) && i->value < 128)){
       printf("?");
     }else{
-      cr_integer * i = (cr_integer *) list->value;
-      if(i->value < 128){
-        printf("%c", (char) i->value);
-      }else{
-        printf("?");
-      }
+      printf("%c", (char) i->value);
     }
     list = list->next;
   }
   printf("\n");
-
+}
+cr_imlist * cr_imlist_reverse(cr_imlist * list){
+  //slow and steady reverse function!
+  cr_imlist * rev = cr_imlist_empty;
+  while(list != cr_imlist_empty){
+    rev = cr_imlist_prepend(rev, list->value);
+    list = list->next;
+  }
+  return rev;
 }

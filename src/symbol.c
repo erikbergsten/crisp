@@ -11,17 +11,31 @@ cr_prototype cr_symbol_prototype = {
   (cr_cmp) cr_symbol_cmp
 };
 cr_map * cr_symbols = NULL;
-cr_symbol * cr_symbol_null = NULL;
 void cr_symbol_destroy(cr_symbol * sym){
   cr_debug_info("Freeing and unsetting symbol: %s", sym->name);
   cr_map_unset(cr_symbols, sym->name);
   free(sym->name);
 }
+
+cr_symbol *cr_symbol_null = NULL,
+          *cr_symbol_true = NULL,
+          *cr_symbol_false = NULL,
+          *cr_symbol_error = NULL,
+          *cr_symbol_rest = NULL;
 void cr_symbol_init(){
   cr_symbols = cr_strmap_new();
   cr_symbol_null = cr_ref(cr_symbol_new("null"));
+  cr_symbol_true = cr_ref(cr_symbol_new("true"));
+  cr_symbol_false = cr_ref(cr_symbol_new("false"));
+  cr_symbol_error = cr_ref(cr_symbol_new("error"));
+  cr_symbol_rest = cr_ref(cr_symbol_new("&"));
 }
 cr_symbol * cr_symbol_new(char * name){
+#ifdef CR_DEBUG
+  if(cr_symbols == NULL){
+    cr_debug_fail("SYMBOLS NOT INITATED: run cr_symbol_init() before using the module");
+  }
+#endif
   cr_symbol * sym = cr_map_get(cr_symbols, name);
   if(sym == NULL){
     sym = (cr_symbol *) cr_mallocS(sizeof(cr_symbol), cr_symbol_destroy);
