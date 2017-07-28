@@ -7,6 +7,7 @@
 #include <crisp/imlist.h>
 #include <crisp/function.h>
 #include <crisp/debug.h>
+#include <crisp/gc.h>
 
 cr_imlist * _eval_rest_args(cr_imlist * args, cr_runtime * runtime, cr_env * env ){
   cr_imlist * list = cr_imlist_empty;
@@ -51,7 +52,7 @@ cr_object * _eval_fun(cr_fun * function,
     char buf[128];
 #endif
     //to evaluate a non-native function we create a new env called fun_env
-    cr_env * fun_env = cr_env_new(fun->env);
+    cr_env * fun_env = cr_ref(cr_env_new(fun->env));
     //The new env has the env in which it was defined
     //as its parent env, not the env in which it was called.
     //See examples/fun_info.cr for an explanation of why.
@@ -99,19 +100,22 @@ cr_object * _eval_fun(cr_fun * function,
         arg_names = arg_names->next;
         args = args->next;
       }
-      //after we have bound the arguments we are ready to evaluate the function
-      cr_object * value = cr_eval((cr_object *) fun->body, //the body of the function
-                                  runtime,   //the runtime
-                                  fun_env);  //the function environment
-#ifdef CR_DEBUG
-      cr_show(buf, value);
-      cr_debug_info("Function returned: %s", buf);
-#endif
-      //Thats it! we have evaluated the function
-      return value;
     }
-  }
+    //after we have bound the arguments we are ready to evaluate the function
+    cr_object * value = cr_eval((cr_object *) fun->body, //the body of the function
+                                runtime,   //the runtime
+                                fun_env);  //the function environment
+#ifdef CR_DEBUG
+    cr_show(buf, value);
+    cr_debug_info("Function returned: %s", buf);
+#endif
 
+    //free the function environment
+    cr_free(fun_env);
+
+    //Thats it! we have evaluated the function
+    return value;
+  }
 }
 cr_object * _eval_macro(cr_macro * macro,
                         cr_imlist * args,
