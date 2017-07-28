@@ -17,6 +17,8 @@ set(SRC "debug.c"
         "parser.c"
         "run.c"
         "core.c"
+        "core_list.c"
+        "core_math.c"
         "tuple.c"
         "gc.c")
 

@@ -16,7 +16,7 @@ test(gc)
 test(symbol)
 test(imlist)
 test(env)
-test(eval)
+#test(eval) #outdated 
 test(tokenizer)
 test(parser)
 test(run)

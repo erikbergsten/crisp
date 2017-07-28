@@ -4,13 +4,14 @@ Todo
 Now
 ---
 
-  * implement "meta" constructs (modules/namespaces)
-  * macros
-  * native core functions
-  * find example of cyclic refs / prove that they cant exist
+* Re implement macros from the ground up
+* Organize eval so its understandable by a human
+* Re write and test core functions
+* Implement repl
 
-Later
------
+
+Future
+------
 
   * write docs!
   * change the GC from simple ref counting to something cooler (boehm)

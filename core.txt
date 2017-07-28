@@ -1,0 +1,24 @@
+funktioner som ska finnas i core:
+fun (macor) (fun args body) -> fun
+macro (macro) (macro args body) -> macro
+def (macro) (def name value) -> binder name till value
+module (macro) (module name) -> sätter modul värdet till name
+(==) (fun) (== a b) -> true om a == b
+(<) (fun) (< a b) 
+(>)
+show -> gör om till str (intlista)
+print -> printar object
+put -> printar str snyggt
+putln -> printar str snyggt
+if 
+case _ of _ _ 
+(let ({key1 vall}
+      {key2 val2})
+     body)
+
+
++ * - / mod
+
+
+
+

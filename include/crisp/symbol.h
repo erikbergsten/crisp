@@ -12,6 +12,7 @@ typedef struct {
 } cr_symbol;
 
 extern cr_symbol * cr_symbol_null;
+#define cr_null ((cr_object *) cr_symbol_null)
 void cr_symbol_init();
 void cr_symbol_clear_all(); //for gc testing purposes
 cr_symbol * cr_symbol_new(char * name);

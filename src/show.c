@@ -36,9 +36,17 @@ void _show_tuple(char * dest, cr_tuple * tuple){
 }
 void _show_fun(char * dest, cr_fun * fun){
   if(fun->form == cr_function_native){
-    sprintfe(dest, "[native function]");
+    if(fun->macro){
+      sprintfe(dest, "[native macro]");
+    }else{
+      sprintfe(dest, "[native function]");
+    }
   }else{
-    sprintfe(dest, "[normal function]");
+    if(fun->macro){
+      sprintfe(dest, "[normal macro]");
+    }else{
+      sprintfe(dest, "[normal function]");
+    }
   }
 }
 void _show_quote(char * dest, cr_quote * q){

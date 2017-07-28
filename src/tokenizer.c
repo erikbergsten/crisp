@@ -122,7 +122,7 @@ int is_digit(char c){
 int is_symbol_start(char c){
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
          (c == '+') || (c == '*') || (c == '-') || (c == '_') ||
-         (c == '/') || (c == '?') || (c == '!');
+         (c == '/') || (c == '?') || (c == '!') || (c == '=');
 }
 int is_symbol(char c){
   return is_symbol_start(c) || (c >= '0' && c <= '9');
