@@ -36,7 +36,6 @@ void cr_force_free(void * ptr){
 void * cr_ref_meta_addr(void * ptr){
   return add_bytes(ptr, -sizeof(_ptr_meta));
 }
-
 int cr_ref_count(void * ptr){
   _ptr_meta * meta = add_bytes(ptr, -sizeof(_ptr_meta));
   return meta->refs;

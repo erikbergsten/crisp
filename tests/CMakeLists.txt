@@ -16,7 +16,11 @@ test(gc)
 test(symbol)
 test(imlist)
 test(env)
-#test(eval) #outdated 
+test(eval) #outdated 
+
+# test(run) #outdated
+
+#parsington tests
+test(token)
 test(tokenizer)
-test(parser)
-test(run)
+test(parser) #outdated

@@ -4,9 +4,6 @@
 #include <crisp/object.h>
 #include <crisp/function.h>
 
-extern cr_symbol *cr_true, *cr_false;
-
-
 void cr_core_init();
 
 void cr_core_register(cr_env * env);

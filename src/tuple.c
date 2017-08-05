@@ -42,6 +42,18 @@ cr_tuple * cr_tuple_new(int n, cr_object ** values){
   }
   return tuple;
 }
+cr_tuple * cr_tuple_from_list(cr_list * values){
+  cr_tuple * tuple = (cr_tuple *) cr_mallocS(sizeof(cr_tuple), cr_tuple_destroy);
+  tuple->prototype = &cr_tuple_prototype;
+  tuple->length = cr_list_length(values);
+  tuple->values = malloc(sizeof(cr_object *) * tuple->length);
+  int i = 0;
+  for(cr_node * node = values->head; node; node = node->next){
+    cr_object * object = (cr_object *) node->value;
+    tuple->values[i++] = cr_ref(object);
+  }
+  return tuple;
+}
 cr_tuple * cr_pair_new(cr_object * obj1, cr_object * obj2){
   cr_tuple * tuple = (cr_tuple *) cr_mallocS(sizeof(cr_tuple), cr_tuple_destroy);
   tuple->prototype = &cr_tuple_prototype;

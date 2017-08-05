@@ -214,10 +214,7 @@ void _add_macro(cr_env * env, char * name, cr_native_function function){
   cr_env_setS(env, cr_symbol_new(name), cr_macro_native_new(function));
 }
 */
-cr_symbol * cr_true, * cr_false;
 void cr_core_init(){
-  cr_true = cr_symbol_new("true");
-  cr_false = cr_symbol_new("false");
 }
 void cr_core_register(cr_env * env){
   _add_fun(env, "module_", cr_core_module);

@@ -1,6 +1,6 @@
 #include <minunit.h>
+#include <parsington/parser.h>
 #include <stdio.h>
-
 #include <crisp/debug.h>
 #include <crisp/gc.h>
 #include <crisp/eval.h>
@@ -8,70 +8,48 @@
 #include <crisp/double.h>
 #include <crisp/function.h>
 #include <crisp/symbol.h>
+#include <crisp/show.h>
 #include <crisp/imlist.h>
 
-cr_object * _add_fun(cr_imlist * list, cr_env * env){
-  int dub = 0;
-  double value = 0;
-  while(list != cr_imlist_empty){
-    cr_object * obj = list->value;
-    if(obj->prototype->type == cr_integer_type){
-      cr_integer * i = (cr_integer *) obj;
-      value += i->value;
-    }else if(obj->prototype->type == cr_double_type){
-      dub = 1;
-      cr_double * d = (cr_double *) obj;
-      value = d->value;
-    }else{
-      return (cr_object *) cr_symbol_null;
-    }
-    list = list->next;
-  }
-  if(dub){
-    return (cr_object *) cr_double_new(value);
-  }else{
-    return (cr_object *) cr_integer_new((int) value);
-  }
-}
 int tests_run = 0;
-static char * test_eval(){
-  cr_env * global = cr_ref(cr_env_new(NULL));
 
-  cr_integer * int1 = cr_integer_new(10);
-  cr_integer * int2 = cr_integer_new(5);
-  cr_double * dub1 = cr_double_new(13.37);
+static char * test_list(){
+  cr_runtime rt;
+  cr_runtime_init(&rt);
+  cr_object * int1 =  cr_ref(pt_parser_parse_str("12"));
+  char buf1[128], buf2[128];
+  cr_object * int1e = cr_eval(int1, &rt, rt.core);
+  cr_show(buf1, int1);
+  cr_show(buf2, int1e);
+  cr_debug_info("before %s", buf1);
+  cr_debug_info("after %s", buf2);
+  cr_free(int1);
 
-  cr_fun * add = cr_ref(cr_fun_native_new(_add_fun));
-
-  cr_imlist * args1 = cr_imlist_prependS(cr_imlist_empty, int2);
-  cr_imlist * args = cr_imlist_prependS(args1, dub1);
-  cr_imlist * call = cr_imlist_prependS(args, add);
-
-  cr_object * res = cr_evalS(call, global);
-  if(res == NULL){
-    cr_debug_info("got null?");
-  }else if(res->prototype == NULL){
-  }else if(res->prototype->type == cr_integer_type){
-    cr_integer * i = (cr_integer *) res;
-    cr_debug_info("addition got: %i", i->value);
-  }else if(res->prototype->type == cr_double_type){
-    cr_double * d = (cr_double *) res;
-    cr_debug_info("addition got: %lf", d->value);
-  }
-
+  cr_object * list1 = cr_ref(pt_parser_parse_str("(core/+ 1 2)"));
+  cr_object * list1e = cr_eval(list1, &rt, rt.core);
+  cr_show(buf1, list1);
+  cr_show(buf2, list1e);
+  cr_debug_info("before %s", buf1);
+  cr_debug_info("after %s", buf2);
 
   return NULL;
 }
-static char * all_tests(){
-  mu_run_test(test_eval);
 
+static char * all_tests(){
+  mu_run_test(test_list);
   return NULL;
 }
 
 int main(){
   cr_imlist_init();
+  cr_symbol_init();
+  pt_token_init();
   cr_debug_init_std();
+  cr_force_free(cr_imlist_empty);
   char * res = all_tests();
+  cr_symbol_clear_all();
+  pt_token_finalize();
+  cr_debug_finish();
   if(res){
     printf("%s\n", res);
     return -1;

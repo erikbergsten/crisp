@@ -1,5 +1,6 @@
 #include <crisp/show.h>
 #include <stdio.h>
+#include <crisp/lookup.h>
 #include <crisp/integer.h>
 #include <crisp/double.h>
 #include <crisp/imlist.h>
@@ -10,6 +11,7 @@
 
 #define sprintfe(buf, format) sprintf(buf + strlen(buf), format)
 #define sprintfa(buf, format, extra) sprintf(buf + strlen(buf), format, extra)
+#define sprintfa2(buf, format, extra, more) sprintf(buf + strlen(buf), format, extra, more)
 
 
 void _cr_show(char * dest, cr_object * obj);
@@ -68,6 +70,12 @@ void _cr_show(char * dest, cr_object * obj){
       {
         cr_symbol * sym = (cr_symbol *) obj;
         sprintfa(dest, "%s", sym->name);
+        break;
+      }
+    case cr_lookup_type:
+      {
+        cr_lookup * lu = (cr_lookup *) obj;
+        sprintfa2(dest, "%s/%s", lu->module->name, lu->name->name);
         break;
       }
     case cr_function_type:

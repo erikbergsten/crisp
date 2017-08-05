@@ -4,6 +4,7 @@
 #include <crisp/object.h>
 #include <crisp/symbol.h>
 #include <crisp/imlist.h>
+#include <crisp/list.h>
 
 typedef struct {
   cr_prototype * prototype;
@@ -12,6 +13,7 @@ typedef struct {
 } cr_tuple;
 
 cr_tuple * cr_tuple_new(int n, cr_object ** values);
+cr_tuple * cr_tuple_from_list(cr_list * values);
 cr_tuple * cr_pair_new(cr_object * obj1, cr_object * obj2);
 
 cr_object * cr_tuple_fst(cr_tuple * tuple);

@@ -2,15 +2,18 @@
 #define __crisp_value_h__
 
 #include <crisp/map.h>
+
+
 typedef enum {
   cr_integer_type,
   cr_double_type,
   cr_list_type,
   cr_symbol_type,
+  cr_lookup_type,
   cr_tuple_type,
   cr_quote_type,
   cr_function_type,
-  cr_macro_type,
+  cr_macro_type,      //not really a type but w/e
   cr_unknown_type
 } cr_type;
 

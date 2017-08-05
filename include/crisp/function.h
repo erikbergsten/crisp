@@ -30,6 +30,7 @@ typedef struct {
   cr_imlist * body;
 } cr_fun_normal;
 cr_fun * cr_fun_new(cr_env * env, cr_imlist * args, cr_imlist * body);
+#define cr_fun_newS(e, a, b) cr_fun_new(e, (cr_imlist *) a, (cr_imlist *) b)
 cr_fun * cr_fun_native_new(cr_native_function function);
 
 

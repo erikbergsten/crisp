@@ -3,37 +3,51 @@
 #include <crisp/debug.h>
 #include <crisp/object.h>
 #include <crisp/gc.h>
+#include <crisp/symbol.h>
 #include <crisp/show.h>
-#include <crisp/tokenizer.h>
 #include <crisp/imlist.h>
-#include <crisp/parser.h>
+#include <parsington/tokenizer.h>
+#include <parsington/token.h>
+#include <parsington/parser.h>
+
 int tests_run = 0;
+char * list_str = "(1 2 3)";
 
 static char * test_parser(){
-  cr_list * tokens = cr_tokenize_file("../test.cr");
-  cr_list * stms = cr_parse(tokens);
-  cr_debug_info("got %i statements", cr_list_length(stms));
+  cr_object * list = pt_parser_parse_str(list_str);
+  char buf[128];
+  cr_show(buf, list);
+  cr_debug_info("read: %s", buf);
+  return NULL;
+}
+static char * test_stdio(){
+  pt_tokenizer * tz = pt_tokenizer_read_file(stdin);
+  cr_object * object = NULL;
   char buf[128];
   int i = 0;
-  for(cr_node * node = stms->head; node; node = node->next){
-    cr_object * obj = (cr_object *) node->value;
-    cr_show(buf, obj);
-    cr_debug_info("Statement #%i of type [%s]: %s", ++i, obj->prototype->name,  buf);
-  }
-
+  do{
+    printf("> ");
+    object = pt_parser_next(tz);
+    cr_show(buf, object);
+    printf("#%i => %s\n", i++, buf);
+  }while(object != NULL);
   return NULL;
 }
 static char * all_tests(){
   mu_run_test(test_parser);
+  cr_debug_info("STDIO test\n");
+  mu_run_test(test_stdio);
   return NULL;
 }
 
 int main(){
   cr_imlist_init();
+  cr_symbol_init();
   cr_debug_init_std();
+  pt_token_init();
   char * res = all_tests();
   if(res){
-    printf("%s\n", res);
+    printf("ERROR: %s\n", res);
     return -1;
   }else{
     printf("PARSER TESTS: ALL TESTS PASSED\n");

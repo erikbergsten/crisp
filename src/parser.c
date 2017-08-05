@@ -1,5 +1,6 @@
-#include <crisp/parser.h>
-#include <crisp/tokenizer.h>
+#include <parsington/parser.h>
+#include <parsington/tokenizer.h>
+#include <parsington/token.h>
 #include <crisp/debug.h>
 #include <crisp/list.h>
 #include <crisp/tuple.h>
@@ -7,134 +8,125 @@
 #include <crisp/symbol.h>
 #include <crisp/quote.h>
 #include <crisp/object.h>
+#include <crisp/lookup.h>
 #include <crisp/gc.h>
 #include <crisp/integer.h>
 #include <crisp/double.h>
-cr_object * _read_object(cr_token * token, cr_list * tokens);
 
-cr_object * _parse_string(cr_text_token * token){
-  cr_object * obj = (cr_object *) cr_imlist_from_str(token->str);
-  free(token->str);
-  free(token);
-  return obj;
+cr_object * _parse_object(pt_tokenizer * tz, pt_token * token);
+
+cr_object * _parse_lookup(pt_lookup_token * token){
+  cr_lookup * lu = cr_lookup_new(token->module, token->name);
+  pt_token_free(token);
+  return (cr_object *) lu;
 }
-cr_object * _parse_tuple(cr_list * tokens){
-  cr_token * token = NULL;
-  cr_list * build = cr_list_newP();
-  int n = 0;
-  while((token = cr_list_shift(tokens)) != NULL){
-    if(token->type == cr_tuple_end){
-      cr_object ** objects = malloc(sizeof(cr_object*) * n);
-      for(int i = 0; i < n; i++){
-        objects[i] = cr_list_shift(build);
-      }
-      cr_tuple * tup = cr_tuple_new(n, objects);
-      free(objects);
-      cr_list_destroy(build);
-      return (cr_object *) tup;
+cr_object * _parse_string(pt_string_token * token){
+  cr_imlist * list = cr_imlist_empty;
+  char * c = token->value;
+  do{
+    list = cr_imlist_prependS(list, cr_integer_new((int) *c));
+  }while((*(++c)) != '\0');
+  pt_token_freeS(token);
+  return (cr_object *) list;
+}
+cr_object * _parse_symbol(pt_symbol_token * token){
+  cr_symbol * sym = cr_symbol_new(token->value);
+  pt_token_freeS(token);
+  return (cr_object *) sym;
+}
+cr_object * _parse_double(pt_float_token * token){
+  cr_double * dubbs = cr_double_new(token->value);
+  pt_token_freeS(token);
+  return (cr_object *) dubbs;
+}
+cr_object * _parse_integer(pt_integer_token * token){
+  cr_integer * i = cr_integer_new(token->value);
+  pt_token_freeS(token);
+  return (cr_object *) i;
+}
+cr_object * _parse_quote(pt_tokenizer * tz){
+  pt_token * token = pt_tokenizer_next(tz);
+  cr_object * obj = _parse_object(tz, token);
+  if(obj == NULL){
+    tz->status = PT_TOKENIZER_FAILED;
+    tz->error = "unfinished quote";
+    return NULL;
+  }else{
+    return (cr_object *) cr_quote_new(obj);
+  }
+}
+cr_object * _parse_tuple(pt_tokenizer * tz){
+  cr_list * elems = cr_list_newP();
+  while(1){
+    pt_token * token = pt_tokenizer_next(tz);
+    if(token == pt_tuple_end_token){
+      cr_tuple * tuple = cr_tuple_from_list(elems);
+      cr_list_destroy(elems);
+      return (cr_object *) tuple;
     }else{
-      cr_object * elem = _read_object(token, tokens);
-      n++;
-      cr_list_append(build, elem);
+      cr_object * elem = _parse_object(tz, token);
+      cr_list_append(elems, elem);
     }
   }
-  cr_debug_warn("FAILED TUPLE PARSE! NULL TOKNE\n");
-  return NULL;
 }
-
-cr_object * _parse_list(cr_list * tokens){
-  cr_token * token = NULL;
-  cr_list * build = cr_list_newP();
-  cr_debug_info("parsing list");
-  while((token = cr_list_shift(tokens)) != NULL){
-    if(token->type == cr_list_end){
-      cr_imlist * list = cr_imlist_empty;
-      cr_object * object = NULL;
-      while((object = cr_list_pop(build)) != NULL){
-        cr_debug_info("adding to imlist..");
-        list = cr_imlist_prepend(list, object);
-      }
-      cr_debug_info("imlist finished!");
-      cr_list_destroy(build);
-      return (cr_object *) list;
+cr_object * _parse_list(pt_tokenizer * tz){
+  cr_imlist * list = cr_imlist_empty;
+  while(1){
+    pt_token * token = pt_tokenizer_next(tz);
+    if(token == pt_list_end_token){
+      //done
+      cr_object * ret = (cr_object *) cr_imlist_reverse(list);
+      cr_free(list);
+      return ret;
     }else{
-      cr_debug_info("adding to list build");
-      cr_object * elem = _read_object(token, tokens);
-      cr_list_append(build, elem);
-    }
-  }
-  cr_debug_warn("FAILED LIST PARSE - NULL TOKEN");
-  return NULL;
-}
-
-cr_object * _parse_quote(cr_list * tokens){
-  cr_token * token = cr_list_shift(tokens);
-  cr_object * obj = _read_object(token, tokens);
-  return (cr_object *) cr_quote_new(obj);
-}
-cr_object * _read_object(cr_token * token, cr_list * tokens){
-  switch(token->type){
-    case cr_int_token_type:
-      {
-        cr_int_token * int_tok = (cr_int_token *) token;
-        cr_integer * i = cr_integer_new(int_tok->value);
-        free(int_tok);
-        return (cr_object *) i;
-        break;
-      }
-    case cr_float_token_type:
-      {
-        cr_float_token * f_tok = (cr_float_token *) token;
-        cr_double * d = cr_double_new(f_tok->value);
-        free(f_tok);
-        return (cr_object *) d;
-        break;
-      }
-    case cr_symbol_token_type:
-      {
-        cr_text_token * sym_tok = (cr_text_token *) token;
-        cr_symbol * s = cr_symbol_new(sym_tok->str);
-        free(sym_tok->str);
-        free(sym_tok);
-        return (cr_object *) s;
-        break;
-      }
-    case cr_string_token_type:
-      {
-        return _parse_string((cr_text_token *) token);
-        break;
-      }
-    case cr_list_start:
-      {
-        return _parse_list(tokens);
-        break;
-      }
-    case cr_tuple_start:
-      {
-        return _parse_tuple(tokens);
-        break;
-      }
-    case cr_quote_token_type:
-      {
-        return _parse_quote(tokens);
-        break;
-      }
-    default:
-      {
-        cr_debug_fail("UNKNOWN TOKEN!\n");
+      cr_object * obj = _parse_object(tz, token);
+      if(obj == NULL){
+        tz->status = PT_TOKENIZER_FAILED;
+        tz->error = "missing list terminator";
         return NULL;
-        break;
+      }else{
+        list = cr_imlist_prependS(list, obj);
       }
+    }
   }
 }
-
-cr_list * cr_parse(cr_list * tokens){
-  cr_list * objects = cr_list_newP();
-  cr_token * token = NULL;
-  while((token = cr_list_shift(tokens)) != NULL){
-    cr_object * obj = _read_object(token, tokens);
-    cr_list_append(objects, obj);
+cr_object * _parse_object(pt_tokenizer * tz, pt_token * token){
+  if(token == NULL){
+    return NULL;
+  }else if(token == pt_list_start_token){
+    return _parse_list(tz);
+  }else if(token == pt_tuple_start_token){
+    return _parse_tuple(tz);
+  }else if(token == pt_quote_token){
+    return _parse_quote(tz);
+  }else if(token->type == pt_integer_tt){
+    return _parse_integer((pt_integer_token *) token);
+  }else if(token->type == pt_float_tt){
+    return _parse_double((pt_float_token *) token);
+  }else if(token->type == pt_symbol_tt){
+    return _parse_symbol((pt_symbol_token *) token);
+  }else if(token->type == pt_string_tt){
+    return _parse_string((pt_string_token *) token);
+  }else if(token->type == pt_lookup_tt){
+    return _parse_lookup((pt_lookup_token *) token);
+  }else{
+    tz->status = PT_TOKENIZER_FAILED;
+    tz->error = "unknown token type";
   }
-  return objects;
+  return NULL;
 }
-
+cr_object * pt_parser_next(pt_tokenizer * tz){
+  if(pt_tokenizer_finished(tz)){
+    return NULL;
+  }else if(pt_tokenizer_failed(tz)){
+    return NULL;
+  }
+  pt_token * token = pt_tokenizer_next(tz);
+  return _parse_object(tz, token);
+}
+cr_object * pt_parser_parse_str(char * str){
+  pt_tokenizer * tz = pt_tokenizer_read_string(str);
+  cr_object * object = pt_parser_next(tz);
+  pt_tokenizer_free(tz);
+  return object;
+}

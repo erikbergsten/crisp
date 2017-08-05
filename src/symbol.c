@@ -21,7 +21,12 @@ cr_symbol *cr_symbol_null = NULL,
           *cr_symbol_true = NULL,
           *cr_symbol_false = NULL,
           *cr_symbol_error = NULL,
-          *cr_symbol_rest = NULL;
+          *cr_symbol_rest = NULL,
+          *cr_symbol_def = NULL,
+          *cr_symbol_module = NULL,
+          *cr_symbol_fun = NULL,
+          *cr_symbol_in = NULL,
+          *cr_symbol_macro = NULL;
 void cr_symbol_init(){
   cr_symbols = cr_strmap_new();
   cr_symbol_null = cr_ref(cr_symbol_new("null"));
@@ -29,7 +34,13 @@ void cr_symbol_init(){
   cr_symbol_false = cr_ref(cr_symbol_new("false"));
   cr_symbol_error = cr_ref(cr_symbol_new("error"));
   cr_symbol_rest = cr_ref(cr_symbol_new("&"));
+  cr_symbol_def = cr_ref(cr_symbol_new("def"));
+  cr_symbol_module = cr_ref(cr_symbol_new("module"));
+  cr_symbol_fun = cr_ref(cr_symbol_new("fun"));
+  cr_symbol_in = cr_ref(cr_symbol_new("in"));
+  cr_symbol_macro = cr_ref(cr_symbol_new("macro"));
 }
+
 cr_symbol * cr_symbol_new(char * name){
 #ifdef CR_DEBUG
   if(cr_symbols == NULL){
@@ -53,8 +64,20 @@ uint32_t cr_symbol_hash(cr_symbol * sym){
 int cr_symbol_cmp(cr_symbol * sym1, cr_symbol * sym2){
   return sym1 != sym2;
 }
+
 void cr_symbol_clear_all(){
-  cr_debug_info("Clearing all #%i symbols.",3);
+  cr_debug_info("Clearing all #%i symbols.", cr_symbols->entries);
+  /*cr_free(cr_symbol_null);
+  cr_symbol
+  cr_free(cr_symbol_false);
+  cr_symbjl_error = cr_ref(cr_symbol_new("error"));
+  cr_symbol_rest = cr_ref(cr_symbol_new("&"));
+  cr_symbol_def = cr_ref(cr_symbol_new("def"));
+  cr_symbol_module = cr_ref(cr_symbol_new("module"));
+  cr_symbol_fun = cr_ref(cr_symbol_new("fun"));
+  cr_symbol_in = cr_ref(cr_symbol_new("in"));
+  cr_symbol_macro = cr_ref(cr_symbol_new("macro"));
+  */
   for(int i = 0; i < cr_symbols->capacity; i++){
     cr_list * bucket = cr_symbols->buckets[i];
     if(bucket){

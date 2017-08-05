@@ -12,7 +12,6 @@ typedef struct {
 } cr_symbol;
 
 
-#define cr_null ((cr_object *) cr_symbol_null)
 void cr_symbol_clear_all(); //for gc testing purposes
 cr_symbol * cr_symbol_new(char * name);
 
@@ -26,8 +25,18 @@ extern cr_symbol *cr_symbol_null, // "null" is used to represent... you guessed 
                  *cr_symbol_true,
                  *cr_symbol_false, // "true" and "false"
                  *cr_symbol_error, //returned by some function in tuples
-                 *cr_symbol_rest; // used by functions to look for variadic
+                 *cr_symbol_rest, // used by functions to look for variadic
                                   // args, symbol: "&"
+                 *cr_symbol_def,  //these 5 symbols are builtin functions
+                 *cr_symbol_module,
+                 *cr_symbol_fun,
+                 *cr_symbol_in,
+                 *cr_symbol_macro;
 
+
+#define cr_null ((cr_object *) cr_symbol_null)
+#define cr_true ((cr_object *) cr_symbol_true)
+#define cr_false ((cr_object *) cr_symbol_false)
+#define cr_error ((cr_object *) cr_symbol_error)
 
 #endif /* __crisp_symbol_h__ */
