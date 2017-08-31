@@ -41,11 +41,17 @@ static char * all_tests(){
 }
 
 int main(){
+  FILE * log = fopen("parser_tests.log", "a+");
+  if(log == NULL){
+    printf("FAILED TO OPEN LOG FILE\n");
+    exit(1);
+  }
+  cr_debug_init(log, log, log);
   cr_imlist_init();
   cr_symbol_init();
-  cr_debug_init_std();
   pt_token_init();
   char * res = all_tests();
+  fclose(log);
   if(res){
     printf("ERROR: %s\n", res);
     return -1;
