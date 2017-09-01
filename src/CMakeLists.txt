@@ -1,10 +1,7 @@
 cmake_minimum_required (VERSION 3.0)
 
-set(SRC "debug.c"
-        "function.c"
-        "list.c"
+set(SRC "function.c"
         "object.c"
-        "map.c"
         "eval.c"
         "env.c"
         "integer.c"
@@ -21,7 +18,7 @@ set(SRC "debug.c"
         "core_list.c"
         "lookup.c"
         "core_math.c"
-        "tuple.c"
-        "gc.c")
+        "tuple.c")
 
 add_library(crisp SHARED ${SRC})
+target_link_libraries(crisp crisp_util)

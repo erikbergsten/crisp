@@ -1,0 +1,3 @@
+[submodule "crisp_util"]
+	path = crisp_util
+	url = git@github.com:erikbergsten/crisp_util.git
