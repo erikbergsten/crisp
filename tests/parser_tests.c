@@ -28,8 +28,12 @@ static char * test_stdio(){
   do{
     printf("> ");
     object = pt_parser_next(tz);
-    cr_show(buf, object);
-    printf("#%i => %s\n", i++, buf);
+    if(object){
+      cr_show(buf, object);
+      printf("#%i => %s\n", i++, buf);
+    }else{
+      printf("WE DONE!\n");
+    }
   }while(object != NULL);
   return NULL;
 }
@@ -46,7 +50,7 @@ int main(){
     printf("FAILED TO OPEN LOG FILE\n");
     exit(1);
   }
-  cr_debug_init(log, log, log);
+  cr_debug_init_std();
   cr_imlist_init();
   cr_symbol_init();
   pt_token_init();

@@ -64,7 +64,12 @@ pt_token * _read_integer(pt_tokenizer * tz, char c){
     _buf_add(tz, '\0');
     pt_token * token = pt_integer_token_new(atoi(tz->buf));
     if(is_whitespace(c)){
-      _pop(tz);
+
+      //STOPPED POPPING BECAUSE IT PROBABLY WASNT NECESSARY BUT MAYBE IT WAS
+      //THERE FOR SOME REASON SO CHECK THIS OUT IF YOU FIND A STRANGE PARSING
+      //BUG
+
+      //_pop(tz);
     }
     _buf_reset(tz);
     tz->mode = pt_default_mode;
@@ -90,9 +95,6 @@ pt_token * _read_float(pt_tokenizer * tz, char c){
     _buf_add(tz, '\0');
     double v = atof(tz->buf);
     pt_token * token = pt_float_token_new(v);
-    if(is_whitespace(c)){
-      _pop(tz);
-    }
     _buf_reset(tz);
     tz->mode = pt_default_mode;
     return token;
@@ -117,9 +119,6 @@ pt_token * _read_symbol(pt_tokenizer * tz, char c){
     pt_token * token = pt_symbol_token_new(tz->buf);
     _buf_reset(tz);
     tz->mode = pt_default_mode;
-    if(is_whitespace(c)){
-      _pop(tz);
-    }
     return token;
   }else if(c == '/'){
     tz->mode = pt_lookup_mode;
