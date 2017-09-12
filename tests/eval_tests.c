@@ -34,9 +34,29 @@ static char * test_list(){
 
   return NULL;
 }
+static char * test_stdio(){
+  cr_runtime rt;
+  cr_runtime_init(&rt);
+  pt_tokenizer * reader = pt_tokenizer_read_file(stdin);
+  cr_object * object = NULL;
+  char buf[128];
+  int i = 0;
+  do{
+    printf("> ");
+    object = pt_parser_next(reader);
+    if(object){
+      cr_show(buf, object);
+      cr_object * res = cr_eval(object, &rt, rt.core);
+      cr_show(buf, res);
+      printf("=> %s\n", buf);
+    }
+  }while(object != NULL);
+  return NULL;
+}
 
 static char * all_tests(){
-  mu_run_test(test_list);
+  //mu_run_test(test_list);
+  mu_run_test(test_stdio);
   return NULL;
 }
 
@@ -44,7 +64,8 @@ int main(){
   cr_imlist_init();
   cr_symbol_init();
   pt_token_init();
-  cr_debug_init_std();
+  FILE * log = fopen("log.txt", "a+");
+  cr_debug_init(log,log,log);
   cr_force_free(cr_imlist_empty);
   char * res = all_tests();
   cr_symbol_clear_all();
