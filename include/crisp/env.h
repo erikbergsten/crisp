@@ -14,5 +14,6 @@ void cr_env_set(cr_env * env, cr_symbol * symbol, cr_object * value);
 cr_object * cr_env_get(cr_env * env, cr_symbol * symbol);
 void cr_env_free_binds(cr_env * env);
 
+void cr_env_show(cr_env * env);
 
 #endif /* __crisp_env_h__ */

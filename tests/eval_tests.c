@@ -37,6 +37,8 @@ static char * test_list(){
 static char * test_stdio(){
   cr_runtime rt;
   cr_runtime_init(&rt);
+  printf("Core module after initialization:\n");
+  cr_env_show(rt.core);
   pt_tokenizer * reader = pt_tokenizer_read_file(stdin);
   cr_object * object = NULL;
   char buf[128];

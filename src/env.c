@@ -49,3 +49,20 @@ cr_object * cr_env_get(cr_env * env, cr_symbol * symbol){
     return (cr_object *) cr_symbol_null;
   }
 }
+
+void cr_env_show(cr_env * env){
+  printf("Symbol:\t   Value:\n");
+  char buf[256];
+  for(int i = 0; i < env->binds->capacity; i++){
+    cr_list * bucket = env->binds->buckets[i];
+    if(bucket != NULL){
+      for(cr_node * node = bucket->head; node; node = node->next){
+        cr_entry * entry = node->value;
+        cr_symbol * sym = (cr_symbol *) entry->key;
+        cr_object * obj = (cr_object *) entry->value;
+        cr_show(buf, obj);
+        printf("%s\t-> %s\n", sym->name, buf);
+      }
+    }
+  }
+}
