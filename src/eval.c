@@ -25,9 +25,20 @@ cr_object * _eval_native(cr_fun_native * fun,
                          cr_runtime * runtime,
                          cr_env * env){
   //most of the work wil be done by the native function code, all we do
-  //is call it!
+  //eval the args list and call it!
   cr_debug_info("Calling native function");
-  cr_object * value = fun->function(args, runtime, env);
+  cr_list * evaled_args = cr_list_newP();
+  while(args != cr_imlist_empty){
+    cr_object * obj = cr_eval(args->value, runtime, env);
+    cr_list_append(evaled_args, obj);
+#ifdef CR_DEBUG
+    char buf[256];
+    cr_show(buf, obj);
+    cr_debug_info("Evaluated argument: %s", buf);
+#endif
+    args = args->next;
+  }
+  cr_object * value = fun->function(evaled_args, runtime, env);
 #ifdef CR_DEBUG
   char buf[256];
   cr_show(buf, value);
@@ -138,7 +149,7 @@ cr_object * _eval_new_def(cr_imlist * list, cr_runtime * runtime, cr_env * env){
 #ifdef CR_DEBUG
   char buf[256];
   cr_show(buf, value);
-  cr_debug_info("Defining %s as %s", name->name, buf);
+  cr_debug_info("Defining %s as %s");
 #endif
   cr_env_set(runtime->current, name, value);
   return cr_null;

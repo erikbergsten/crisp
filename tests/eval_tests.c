@@ -66,8 +66,8 @@ int main(){
   cr_imlist_init();
   cr_symbol_init();
   pt_token_init();
-  FILE * log = fopen("log.txt", "a+");
-  cr_debug_init(log,log,log);
+//  FILE * log = fopen("log.txt", "a+");
+  cr_debug_init_std();
   cr_force_free(cr_imlist_empty);
   char * res = all_tests();
   cr_symbol_clear_all();

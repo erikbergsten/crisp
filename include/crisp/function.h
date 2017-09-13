@@ -5,12 +5,11 @@
 #include <crisp/env.h>
 #include <crisp/run.h>
 
-typedef cr_object * (*cr_native_function)(cr_imlist * args, cr_runtime * runtime, cr_env * env);
+typedef cr_object * (*cr_native_function)(cr_list * args, cr_runtime * runtime, cr_env * env);
 typedef enum {
   cr_function_native,
   cr_function_normal
 } cr_function_form;
-
 typedef struct {
   cr_prototype * prototype;
   cr_function_form form;
