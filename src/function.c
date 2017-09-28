@@ -28,6 +28,7 @@ cr_fun * cr_fun_new(cr_env * env, cr_imlist * args, cr_imlist * body){
   fun->args = cr_ref(args);
   fun->body = cr_ref(body);
   fun->overloaded = 0;
+  fun->macro = 0;
   return (cr_fun *) fun;
 }
 
@@ -39,6 +40,33 @@ cr_fun * cr_fun_native_new(cr_native_function function){
     (cr_fun_native *) cr_mallocS(sizeof(cr_fun_native), native_killer);
   fun->function = function;
   fun->form = cr_function_native;
+  fun->macro = 0;
   fun->prototype = &cr_fun_prototype;
   return (cr_fun *) fun;
 }
+
+
+//dumb macro stuff!
+cr_fun * cr_macro_native_new(cr_native_function function){
+  cr_fun_native * fun =
+    (cr_fun_native *) cr_mallocS(sizeof(cr_fun_native), native_killer);
+  fun->function = function;
+  fun->form = cr_function_native;
+  fun->macro = 1;
+  fun->prototype = &cr_fun_prototype;
+  return (cr_fun *) fun;
+}
+cr_fun * cr_macro_new(cr_env * env, cr_imlist * args, cr_imlist * body){
+  cr_fun_normal * fun =
+    (cr_fun_normal *) cr_mallocS(sizeof(cr_fun_normal), cr_fun_destroy);
+  fun->prototype = &cr_fun_prototype;
+  fun->env = cr_ref(env);
+  fun->form = cr_function_normal;
+  fun->args = cr_ref(args);
+  fun->body = cr_ref(body);
+  fun->overloaded = 0;
+  fun->macro = 1;
+  return (cr_fun *) fun;
+}
+
+

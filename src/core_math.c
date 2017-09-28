@@ -33,11 +33,10 @@ cr_object * cr_core_math_add(cr_list * args, cr_runtime * rt, cr_env * env){
   }
 }
 cr_object * cr_core_math_mul(cr_list * args, cr_runtime * rt, cr_env * env){
-  /*
   double value = 1;
   int dubs = 0;
-  while(args != cr_imlist_empty){
-    cr_object * obj = (cr_object *) args->value;
+  for(cr_node * node = args->head; node; node = node->next){
+    cr_object * obj = (cr_object *) node->value;
     if(obj->prototype->type == cr_integer_type){
       cr_integer * i = (cr_integer *) obj;
       value *= i->value;
@@ -48,14 +47,12 @@ cr_object * cr_core_math_mul(cr_list * args, cr_runtime * rt, cr_env * env){
     }else{
       return (cr_object *) cr_tuple_error("+ only works with integers and doubles");
     }
-    args = args->next;
   }
   if(dubs){
     return (cr_object *) cr_double_new(value);
   }else{
     return (cr_object *) cr_integer_new((int) value);
   }
-  */
 }
 cr_object * cr_core_math_div(cr_list * args, cr_runtime * rt, cr_env * env){
   /*
@@ -93,39 +90,37 @@ cr_object * cr_core_math_div(cr_list * args, cr_runtime * rt, cr_env * env){
   */
 }
 cr_object * cr_core_math_sub(cr_list * args, cr_runtime * rt, cr_env * env){
-  /*
   double value = 0;
   int dubs = 0;
-  cr_object * obj = args->value;
-  if(obj->prototype->type == cr_double_type){
-    cr_double * d = (cr_double *) obj;
-    dubs = 1;
-    value = d->value;
-  }else if(obj->prototype->type == cr_integer_type){
-    cr_integer * i = (cr_integer *) obj;
-    value = i->value;
-  }
-  args = args->next;
-  while(args != cr_imlist_empty){
-    cr_object * obj = (cr_object *) args->value;
+  int init = 1;
+  for(cr_node * node = args->head; node; node = node->next){
+    cr_object * obj = (cr_object *) node->value;
     if(obj->prototype->type == cr_integer_type){
       cr_integer * i = (cr_integer *) obj;
-      value -= i->value;
+      if(init){
+        value += i->value;
+        init = 0;
+      }else{
+        value -= i->value;
+      }
     }else if(obj->prototype->type == cr_double_type){
       dubs = 1;
       cr_double * d = (cr_double *) obj;
-      value -= d->value;
+      if(init){
+        value += d->value;
+        init = 0;
+      }else{
+        value -= d->value;
+      }
     }else{
       return (cr_object *) cr_tuple_error("+ only works with integers and doubles");
     }
-    args = args->next;
   }
   if(dubs){
     return (cr_object *) cr_double_new(value);
   }else{
     return (cr_object *) cr_integer_new((int) value);
   }
-  */
 }
 
 

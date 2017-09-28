@@ -1,6 +1,5 @@
 #include <crisp/eval.h>
 #include <crisp/integer.h>
-#include <crisp/macro.h>
 #include <crisp/lookup.h>
 #include <crisp/show.h>
 #include <crisp/env.h>
@@ -29,7 +28,13 @@ cr_object * _eval_native(cr_fun_native * fun,
   cr_debug_info("Calling native function");
   cr_list * evaled_args = cr_list_newP();
   while(args != cr_imlist_empty){
-    cr_object * obj = cr_eval(args->value, runtime, env);
+
+    cr_object * obj;
+    if(fun->macro == 0){
+      obj = cr_eval(args->value, runtime, env);
+    }else{
+      obj = args->value;
+    }
     cr_list_append(evaled_args, obj);
 #ifdef CR_DEBUG
     char buf[256];
@@ -46,8 +51,17 @@ cr_object * _eval_native(cr_fun_native * fun,
 #endif
 
   cr_list_destroy(evaled_args);
-  //thats all there is to it
-  return value;
+
+  if(fun->macro){
+    //if the function is a macro we now evaluate the returned form
+    cr_debug_info("Evaluating macro return form.");
+    cr_object * ret = cr_eval(value, runtime, env);
+    cr_free(value);
+    return ret;
+  }else{
+    //otherwise we just return the value
+    return value;
+  }
 }
 cr_object * _eval_fun(cr_fun * function,
                       cr_imlist * args,
@@ -130,7 +144,7 @@ cr_object * _eval_fun(cr_fun * function,
     return value;
   }
 }
-cr_object * _eval_macro(cr_macro * macro,
+cr_object * _eval_macro(cr_fun * macro,
                         cr_imlist * args,
                         cr_runtime * runtime,
                         cr_env * env){
@@ -150,7 +164,7 @@ cr_object * _eval_new_def(cr_imlist * list, cr_runtime * runtime, cr_env * env){
 #ifdef CR_DEBUG
   char buf[256];
   cr_show(buf, value);
-  cr_debug_info("Defining %s as %s");
+  cr_debug_info("Defining %s as %s", name->name, buf);
 #endif
   cr_env_set(runtime->current, name, value);
   return cr_null;
@@ -185,8 +199,14 @@ cr_object * _eval_new_fun(cr_imlist * list, cr_runtime * runtime, cr_env * env){
   return (cr_object *) cr_fun_newS(env, args, body);
 }
 cr_object * _eval_new_macro(cr_imlist * list, cr_runtime * runtime, cr_env * env){
-  //not yet implemented
-  return NULL;
+  cr_imlist * args = (cr_imlist *) list->value;
+  if(!cr_object_type(args, cr_list_type)){
+    cr_debug_fail("Invalid function!");
+    return NULL;
+  }
+  list = list->next;
+  cr_object * body = list->value;
+  return (cr_object *) cr_macro_newS(env, args, body);
 }
 
 
@@ -230,7 +250,7 @@ cr_object * _eval_list(cr_imlist * list, cr_runtime * runtime, cr_env * env){
                      env);           //the current evaluation environment
   }else if(cr_object_type(app, cr_macro_type)){
     //run macro
-    return _eval_macro((cr_macro *) app,
+    return _eval_macro((cr_fun *) app,
                         list->next,
                         runtime,
                         env);

@@ -44,7 +44,9 @@ pt_tokenizer * pt_tokenizer_read_path(char * src){
 #define _fail(tz, msg) do{tz->status = PT_TOKENIZER_FAILED; tz->error = msg;}while(0)
 #define is_symbol_start(c) ((c >= 'a' && c <= 'z') || \
                            (c >= 'A' && c <= 'Z') || \
-                           (c == '+') || (c == '*'))
+                           (c == '+') || (c == '*') || \
+                           (c == '=') || (c == '-') || \
+                           (c == '_') || (c == '/'))
 #define is_symbol(c) (is_symbol_start(c) || (c >= '0' && c <= '9'))
 #define is_whitespace(c) ((c == ' ') || (c == '\n') || (c == '\t'))
 #define is_terminal(c) (c == ')' || c == '}')

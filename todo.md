@@ -4,10 +4,13 @@ Todo
 Now
 ---
 
-* Re implement macros from the ground up
-* Organize eval so its understandable by a human
-* Re write and test core functions
-* Implement repl
+  * implement evaluation of non-native macros
+  * standardize native function system
+  * make the repl nicer
+  * fix the modules
+  * add negative number reading to the parser, fix string parsing (quote the list!)
+  * implement keywords/basic operations as functions and remove special treatment
+  * implement tail call optimization or clojure style alternative
 
 
 Future
