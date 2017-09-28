@@ -45,6 +45,7 @@ cr_object * _eval_native(cr_fun_native * fun,
   cr_debug_info("Native function returned: %s", buf);
 #endif
 
+  cr_list_destroy(evaled_args);
   //thats all there is to it
   return value;
 }

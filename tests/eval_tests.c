@@ -47,12 +47,18 @@ static char * test_stdio(){
     printf("> ");
     object = pt_parser_next(reader);
     if(object){
+      cr_ref(object);
       cr_show(buf, object);
       cr_object * res = cr_eval(object, &rt, rt.core);
+      cr_ref(res);
       cr_show(buf, res);
       printf("=> %s\n", buf);
+      cr_free(object);
+      cr_free(res);
     }
   }while(object != NULL);
+  cr_runtime_finish(&rt);
+  pt_tokenizer_free(reader);
   return NULL;
 }
 
